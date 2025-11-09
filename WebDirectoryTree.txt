@@ -1,0 +1,27 @@
+OptimizeTouristRoutes_GTS/
+├── app/
+│   ├── __init__.py          # Khởi tạo ứng dụng Flask, kết nối database (SQLAlchemy), và cấu hình blueprints
+│   ├── models.py            # Định nghĩa các model database (Quan, LoaiDiemThamQuan, DiemThamQuan, HinhAnhDiem) sử dụng SQLAlchemy
+│   ├── routes.py            # Định nghĩa các route cho 3 trang chính: chọn điểm, hiển thị bản đồ, tìm đường (tích hợp GTS)
+│   ├── forms.py             # Định nghĩa form Flask-WTF cho trang chọn điểm tham quan (ví dụ: chọn quận, loại, danh sách điểm)
+│   ├── algorithms/
+│   │   └── gts.py           # Module triển khai thuật toán Greedy TSP để tối ưu tuyến đường dựa trên tọa độ (ViDo, KinhDo)
+│   ├── utils.py             # Các hàm hỗ trợ: tính khoảng cách (Haversine), xử lý dữ liệu bản đồ, kết nối API maps nếu cần
+│   ├── templates/
+│   │   ├── base.html        # Template cơ bản (layout chung với header, footer, CSS/JS links)
+│   │   ├── select_points.html  # Trang chọn điểm tham quan: form chọn quận/loại/điểm, danh sách với checkbox
+│   │   ├── display_map.html    # Trang hiển thị bản đồ: tích hợp Leaflet/Google Maps JS để vẽ điểm tham quan
+│   │   └── find_route.html     # Trang tìm đường: hiển thị tuyến đường tối ưu bằng GTS, bản đồ với polyline
+│   └── static/
+│       ├── css/
+│       │   └── main.css     # CSS chung cho giao diện (responsive, button, map container)
+│       ├── js/
+│       │   ├── map.js       # JS xử lý bản đồ (Leaflet hoặc Google Maps API để vẽ điểm và tuyến đường)
+│       │   └── select.js    # JS cho trang chọn: dynamic filter quận/loại, checkbox validation
+│       └── images/
+│           └── placeholder.png  # Hình ảnh mặc định hoặc tải từ URL trong database
+├── config.py                # Cấu hình app: SECRET_KEY, SQLALCHEMY_DATABASE_URI (cho SQL Server hoặc SQLite), API keys nếu dùng maps
+├── database.sql             # File SQL script để tạo bảng và insert dữ liệu (từ tài liệu pasted-text.txt)
+├── requirements.txt         # Danh sách packages: flask, flask-sqlalchemy, flask-wtf, geopy (cho khoảng cách), folium (nếu dùng static map)
+├── run.py                   # File chạy app: from app import app; app.run(debug=True)
+└── README.md                # Hướng dẫn dự án: mô tả, cách setup database, chạy app, tích hợp GTS cho tối ưu tuyến đường du lịch
