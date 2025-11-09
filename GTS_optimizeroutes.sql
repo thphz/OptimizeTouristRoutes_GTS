@@ -1,18 +1,4 @@
-﻿-- Phân quyền
-CREATE USER [dev_readonly] WITH PASSWORD = 'Read@77346';
-EXEC sp_addrolemember 'db_datareader', 'dev_readonly';
-
-
-
-SELECT name, type_desc FROM sys.database_principals WHERE type IN ('S', 'E', 'X');
-
-SELECT dp1.name AS DatabaseRoleName, dp2.name AS MemberName  
-FROM sys.database_role_members AS drm  
-JOIN sys.database_principals AS dp1 ON drm.role_principal_id = dp1.principal_id  
-JOIN sys.database_principals AS dp2 ON drm.member_principal_id = dp2.principal_id;
-
-
-CREATE TABLE Quan (
+﻿CREATE TABLE Quan (
     QuanID INT IDENTITY PRIMARY KEY,
     TenQuan NVARCHAR(100) NOT NULL,
     MoTa NVARCHAR(255)
