@@ -1,7 +1,6 @@
 # OptimizeTouristRoutes_GTS
 
-## Sử dụng biến môi trường (ngắn)
-
+## Sử dụng biến môi trường
 `config.py` trong project sẽ ưu tiên dùng các biến môi trường sau:
 
 - `DATABASE_URL_ODBC` — (tùy chọn) đặt toàn bộ ODBC connection string (bao gồm mật khẩu). Nếu có biến này, chương trình sẽ dùng trực tiếp.
