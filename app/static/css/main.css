@@ -1,0 +1,14 @@
+/* CSS cơ bản của dự án và điều chỉnh cho UI select_points */
+body { background-color: #f7fbff; }
+.card { border-radius: 12px; }
+.diem-item { cursor: pointer; }
+.diem-item label { cursor: pointer; }
+.diem-item .badge { font-size: 0.75rem; }
+
+/* Kiểu cho danh sách tóm tắt đã chọn */
+#selected-summary-list li { background: #fff; }
+
+/* Điều chỉnh cho màn hình nhỏ (responsive) */
+@media (max-width: 992px) {
+	#mini-map { height: 200px !important; }
+}
