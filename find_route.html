@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tuyến đường tối ưu</title>
+</head>
+<body>
+<h1>Tuyến đường tối ưu</h1>
+<div>{{ map_html|safe }}</div>
+<ol>
+    {% for d in route %}
+        <li>{{ d.TenDiem }} ({{ d.ViDo }}, {{ d.KinhDo }})</li>
+    {% endfor %}
+</ol>
+<a href="{{ url_for('main.select_points') }}">Chọn lại</a>
+</body>
+</html>
