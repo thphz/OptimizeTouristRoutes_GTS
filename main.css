@@ -1,7 +1,0 @@
-body {font-family: 'Segoe UI', sans-serif; margin: 0; background: #f5f8fa;}
-.header {background: #007bff; color: white; padding: 16px; text-align: center;}
-.map-section {width: 100%; text-align: center; margin-top: 10px;}
-#map {width: 90%; height: 500px; margin: auto; border-radius: 10px; overflow: hidden;}
-.list-section {width: 80%; margin: 20px auto; background: white; padding: 20px; border-radius: 10px;}
-button {background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 8px;}
-footer {text-align: center; padding: 10px; background: #e9ecef; margin-top: 20px;}
