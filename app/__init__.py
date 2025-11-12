@@ -17,10 +17,10 @@ except Exception:
     db = None
 
 # Import routes để chúng được đăng ký với ứng dụng
-# try:
-#     from app import routes  # noqa: F401
-# except Exception:
-#     # routes có thể chưa tồn tại trong giai đoạn phát triển ban đầu; bỏ qua lỗi import ở đây
-#     pass
+try:
+    from app import routes  # noqa: F401
+except Exception:
+    # routes có thể chưa tồn tại trong giai đoạn phát triển ban đầu; bỏ qua lỗi import ở đây
+    pass
 
 __all__ = ['app', 'db']

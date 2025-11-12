@@ -1,5 +1,5 @@
-from flask import render_template, request, redirect, url_for
 from app import app
+from flask import redirect, url_for, request, render_template
 
 
 class Obj:
@@ -15,21 +15,36 @@ def index():
 
 @app.route('/select_points', methods=['GET', 'POST'])
 def select_points():
-    """Render the select points page.
-
-    If a real database and models are present, you should replace the
-    mock data below with queries to your models (Quan, LoaiDiemThamQuan,
-    DiemThamQuan). For development this route provides sample data so the
-    UI can be tested immediately.
-    """
     # Cố gắng tải từ các model thực tế; nếu có lỗi thì dùng dữ liệu giả để thay thế
     error = None
     try:
-        from app.models import Quan, LoaiDiemThamQuan, DiemThamQuan
+        from app.models import Quan, LoaiDiemThamQuan, DiemThamQuan, compute_travel_durations_from_dinh_doc_lap
 
         quans = Quan.query.order_by(Quan.TenQuan).all()
         loai_diems = LoaiDiemThamQuan.query.order_by(LoaiDiemThamQuan.TenLoai).all()
         diems = DiemThamQuan.query.order_by(DiemThamQuan.TenDiem).all()
+
+        # tính thời gian di chuyển từ điểm gốc và gắn vào từng diem dưới thuộc tính _computed_duration
+        try:
+            durations = compute_travel_durations_from_dinh_doc_lap(diems)
+            # chuẩn hoá về dict để tránh lỗi NoneType
+            if not isinstance(durations, dict):
+                app.logger.debug('compute_travel_durations_from_dinh_doc_lap returned non-dict (%r), normalizing to empty dict', durations)
+                durations = {}
+            app.logger.debug('Computed travel durations: %s', durations)
+            for d in diems:
+                rid = getattr(d, 'id', None)
+                # fallback về thuộc tính duration hoặc --
+                default_dur = getattr(d, 'duration', "--")
+                if rid is not None:
+                    setattr(d, '_computed_duration', durations.get(rid, default_dur))
+                else:
+                    setattr(d, '_computed_duration', default_dur)
+        except Exception:
+            # không để lỗi làm crash page,vẫn đảm bảo thuộc tính tồn tại
+            app.logger.exception('Could not compute travel durations; falling back to defaults')
+            for d in diems:
+                setattr(d, '_computed_duration', getattr(d, 'duration', "--"))
 
         if request.method == 'POST':
             selected = request.form.getlist('selected_diems')
@@ -54,6 +69,26 @@ def select_points():
             Obj(id=4, ten='Phố Đi Bộ Nguyễn Huệ', duration=45, quan_id=1, quan=quans[0], loai_id=2, vi_do=10.7774, kinh_do=106.6991),
             Obj(id=5, ten='Bảo Tàng Chứng Tích Chiến Tranh', duration=90, quan_id=3, quan=quans[1], loai_id=2, vi_do=10.7776, kinh_do=106.6887),
         ]
+
+        # tính thời gian cho dữ liệu giả
+        try:
+            from app.models import compute_travel_durations_from_dinh_doc_lap
+            durations = compute_travel_durations_from_dinh_doc_lap(diems)
+            if not isinstance(durations, dict):
+                app.logger.debug('compute_travel_durations_from_dinh_doc_lap (mock) returned non-dict (%r), normalizing to empty dict', durations)
+                durations = {}
+            app.logger.debug('Computed travel durations (mock): %s', durations)
+            for d in diems:
+                rid = getattr(d, 'id', None)
+                default_dur = getattr(d, 'duration', "--")
+                if rid is not None:
+                    setattr(d, '_computed_duration', durations.get(rid, default_dur))
+                else:
+                    setattr(d, '_computed_duration', default_dur)
+        except Exception:
+            app.logger.exception('Could not compute travel durations for mock data')
+            for d in diems:
+                setattr(d, '_computed_duration', getattr(d, 'duration', "--"))
 
         if request.method == 'POST':
             selected = request.form.getlist('selected_diems')

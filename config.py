@@ -1,18 +1,18 @@
 """
-Configuration for OptimizeTouristRoutes_GTS
+Cấu hình cho OptimizeTouristRoutes_GTS
 
-This file builds a SQLALCHEMY_DATABASE_URI suitable for SQL Server using the
-ODBC connection string template you provided. For security, the database
-password should be provided via environment variable `DB_PASSWORD` or you can
-provide a full ODBC connection string through `DATABASE_URL_ODBC`.
+Tệp này xây dựng `SQLALCHEMY_DATABASE_URI` phù hợp cho SQL Server sử dụng
+chuỗi kết nối ODBC. Vì lý do bảo mật, mật khẩu cơ sở dữ liệu nên được cung
+qua biến môi trường `DB_PASSWORD` hoặc bạn có thể cung cấp chuỗi ODBC đầy đủ
+thông qua `DATABASE_URL_ODBC`.
 
-Example ODBC template (place your password in DB_PASSWORD):
+Ví dụ mẫu ODBC (đặt mật khẩu vào DB_PASSWORD):
 
 Driver={ODBC Driver 18 for SQL Server};Server=tcp:optimizetouristroutes.database.windows.net,1433;Database=OptimizeTouristRoutesDB;Uid=thphz363;Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
 
-SQLAlchemy will use the pyodbc dialect with an encoded odbc_connect string.
-Make sure you have the ODBC Driver 18 for SQL Server installed on the host
-and `pyodbc` and `sqlalchemy` installed in your Python environment.
+SQLAlchemy sẽ sử dụng dialect `pyodbc` với chuỗi `odbc_connect` đã mã hóa.
+Hãy đảm bảo bạn đã cài ODBC Driver 18 for SQL Server trên máy và đã cài
+`pyodbc` cùng `sqlalchemy` trong môi trường Python. (t đã dịch)
 """
 
 import os
@@ -39,7 +39,7 @@ if not odbc_conn:
 		r"Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 	)
 
-# Mã hóa (URL-encode) conn string ODBC
+# Mã hóa (URL-encode) chuỗi kết nối ODBC
 odbc_conn_quoted = urllib.parse.quote_plus(odbc_conn)
 
 # Chuỗi kết nối SQLAlchemy dùng pyodbc
