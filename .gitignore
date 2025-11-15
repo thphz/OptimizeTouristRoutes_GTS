@@ -1,6 +1,0 @@
-# Lờ đi các file cache của Python
-__pycache__/
-*.pyc
-
-# Lờ đi các file Cấu hình Môi trường (CHỨA MẬT KHẨU)
-*.env
