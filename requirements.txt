@@ -1,0 +1,5 @@
+flask
+flask-sqlalchemy
+pyodbc
+folium
+requests

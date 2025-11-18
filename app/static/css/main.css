@@ -1,7 +1,278 @@
-body {font-family: 'Segoe UI', sans-serif; margin: 0; background: #f5f8fa;}
-.header {background: #007bff; color: white; padding: 16px; text-align: center;}
-.map-section {width: 100%; text-align: center; margin-top: 10px;}
-#map {width: 90%; height: 500px; margin: auto; border-radius: 10px; overflow: hidden;}
-.list-section {width: 80%; margin: 20px auto; background: white; padding: 20px; border-radius: 10px;}
-button {background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 8px;}
-footer {text-align: center; padding: 10px; background: #e9ecef; margin-top: 20px;}
+/* Màu sắc chính và Biến */
+:root {
+    --header-blue: #0A66C2; 
+    --page-title-blue: #007bff; 
+    --tab-inactive-color: #6c757d;
+    --dot-size: 7px; 
+    --bg-content: #f7f7f7; 
+    --bg-wrapper: #ffffff; 
+    --bg-body: #333333; 
+    --font-size-small: 0.75rem;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: var(--bg-body); 
+}
+
+/* --- WRAPPER NỘI DUNG --- */
+.content-wrapper {
+    margin: 0 auto;
+    max-width: 900px;
+    background-color: var(--bg-wrapper); 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+    min-height: 100vh;
+}
+
+/* --- KHỐI HEADER TRANG --- */
+.custom-app-header {
+    display: none;
+}
+.page-top-block {
+    border-bottom: none;
+}
+.custom-app-header-content {
+    background-color: var(--page-title-blue); 
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-app-info p {
+    font-size: 0.95rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+.header-app-info small {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+.design-by-bar {
+    text-align: right;
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap; 
+}
+
+
+/* --- TAB NAVIGATION (Lộ trình, Bản đồ, Tìm đường) --- */
+.map-tabs-container {
+    background-color: var(--bg-wrapper); 
+    padding: 10px 15px 0; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.map-tabs .nav-item {
+    flex-grow: 0; 
+    margin-right: 15px; 
+}
+.map-tabs .map-tab {
+    color: var(--tab-inactive-color);
+    padding: 8px 15px; 
+    font-weight: 500;
+    font-size: 0.85rem; 
+    border-radius: 4px; 
+    background-color: var(--bg-content); 
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.map-tabs .map-tab.active {
+    color: #333; 
+    background-color: white; 
+    border-color: #ddd;
+    font-weight: bold;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    top: 1px;
+    border-bottom-color: white; 
+}
+/* ... (Giữ nguyên các định nghĩa CSS cũ) ... */
+
+/* --- KHUNG BẢN ĐỒ --- */
+.map-container {
+    height: 350px !important; /* Đảm bảo có chiều cao cố định */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+    z-index: 0; 
+}
+
+/* --- CLASS MÀU ĐỘNG CHO CHẤM ĐIỂM (KHỚP VỚI routes.py) --- */
+.poi-color-dot.color-dot-red, .legend-dot.color-dot-red { background-color: red !important; }
+.poi-color-dot.color-dot-blue, .legend-dot.color-dot-blue { background-color: blue !important; }
+.poi-color-dot.color-dot-purple, .legend-dot.color-dot-purple { background-color: purple !important; }
+.poi-color-dot.color-dot-orange, .legend-dot.color-dot-orange { background-color: orange !important; }
+.poi-color-dot.color-dot-green, .legend-dot.color-dot-green { background-color: green !important; }
+/* ... (Phần còn lại của main.css) ... */
+
+/* --- NỘI DUNG CHÍNH (Map/List) --- */
+.content-inner-area {
+    padding: 15px !important; 
+    padding-top: 10px !important;
+    background-color: var(--bg-content); 
+}
+
+/* KHUNG BẢN ĐỒ (Map Card) */
+.map-card {
+    background-color: var(--bg-wrapper); 
+    box-shadow: none !important;
+    border: none;
+    border-radius: 0; 
+}
+.map-card .card-body {
+    padding: 15px !important;
+}
+.map-card h6 {
+    font-size: 0.9rem; 
+    font-weight: bold;
+}
+.map-subtitle {
+    font-size: 0.75rem; 
+    margin-bottom: 10px !important;
+}
+.map-container {
+    height: 350px; 
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+}
+
+/* KHUNG DANH SÁCH (List Card) */
+.poi-list-card {
+    background-color: var(--bg-wrapper); 
+    box-shadow: none !important;
+    margin-top: 20px; 
+    border: none;
+    border-radius: 0; 
+}
+.poi-list-title {
+    font-size: 0.95rem; 
+    padding-top: 10px;
+    margin-bottom: 5px !important;
+    font-weight: 500;
+}
+
+/* Ô Tìm kiếm */
+.poi-search-input {
+    margin-bottom: 10px !important;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+.poi-search-input .form-control {
+    font-size: 0.9rem;
+    border: 1px solid #ccc !important; 
+    border-radius: 4px !important;
+    background-color: white !important;
+}
+.search-icon-wrapper {
+    background-color: white !important;
+    border: 1px solid #ccc !important;
+    border-right: none !important;
+    border-radius: 4px 0 0 4px !important;
+}
+
+/* BUTTONS Lọc theo loại */
+.filter-tabs-area {
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+.filter-label-text {
+    font-size: 0.75rem !important; 
+    font-weight: bold;
+    color: #333 !important;
+    margin-right: 5px !important;
+}
+.filter-btn {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: #333;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+.filter-btn.active {
+    background-color: #333; 
+    color: white;
+    border-color: #333;
+    font-weight: normal; 
+}
+
+/* Danh sách Điểm (POI Item) */
+.poi-list-container {
+    padding-top: 5px;
+    padding-left: 10px; 
+}
+.poi-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 6px 0; 
+    margin-left: 0;
+    background-color: white; 
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+.poi-item:last-child {
+    border-bottom: none;
+}
+
+.poi-color-dot {
+    width: var(--dot-size);
+    height: var(--dot-size);
+    margin-right: 15px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.poi-name {
+    font-size: 0.85rem; 
+    font-weight: 500;
+    margin-bottom: 0;
+}
+.poi-quan {
+    font-size: 0.7rem; 
+    color: #999 !important;
+    margin-top: -3px; 
+    margin-bottom: 0;
+}
+
+/* Chú thích (Legend) */
+.legend-area {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+    padding-left: 10px;
+}
+.legend-title-text {
+    font-weight: bold;
+    font-size: 0.8rem !important;
+}
+.legend-item {
+    font-size: 0.8rem;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* --- FOOTER --- */
+.custom-app-footer {
+    background: #444 !important; 
+    color: white;
+    padding: 8px 0 !important;
+    margin-top: 0;
+}
+.footer-text {
+    font-size: 0.7rem !important;
+}
+
+/* --- CLASS MÀU ĐỘNG CHO    ĐIỂM --- */
+.poi-color-dot.color-dot-red, .legend-dot.color-dot-red { background-color: red !important; }
+.poi-color-dot.color-dot-blue, .legend-dot.color-dot-blue { background-color: blue !important; }
+.poi-color-dot.color-dot-purple, .legend-dot.color-dot-purple { background-color: purple !important; }
+.poi-color-dot.color-dot-orange, .legend-dot.color-dot-orange { background-color: orange !important; }
+.poi-color-dot.color-dot-green, .legend-dot.color-dot-green { background-color: green !important; }

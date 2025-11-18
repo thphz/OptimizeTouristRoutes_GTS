@@ -1,45 +1,37 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>{% block title %}Optimize Routes{% endblock %}</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    {# Leaflet CSS: Giữ lại để định dạng #}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+         crossorigin=""/>
 
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-" crossorigin="anonymous">
-
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-		{% block head %}{% endblock %}
-	</head>
-	<body>
-		<header class="bg-primary text-white py-3 mb-4 shadow-sm">
-			<div class="container d-flex align-items-center justify-content-between">
-				<div class="d-flex align-items-center">
-					<i class="bi bi-geo-alt-fill fs-3 me-2"></i>
-					<div>
-						<h5 class="mb-0">Hướng Dẫn Du Lịch TP.HCM</h5>
-						<small>Khám phá danh thắng lịch sử Sài Gòn</small>
-					</div>
-				</div>
-				<div>
-					<small>Design By Nhóm 1</small>
-				</div>
-			</div>
-		</header>
-
-		<main class="container mb-5">
-			{% block content %}{% endblock %}
-		</main>
-
-		<footer class="bg-dark text-white py-2 mt-auto">
-			<div class="container text-center small">© 2025 Hướng Dẫn Du Lịch TP.HCM - Khám phá vẻ đẹp Sài Gòn</div>
-		</footer>
-
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-" crossorigin="anonymous"></script>
-		<script src="{{ url_for('static', filename='js/map.js') }}"></script>
-		<script src="{{ url_for('static', filename='js/select.js') }}"></script>
-		{% block scripts %}{% endblock %}
-	</body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="content-wrapper">
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        
+        <footer class="custom-app-footer text-center">
+            <p class="footer-text mb-0">
+                © 2025 Hướng Dẫn Du Lịch TP.HCM - Khám phá vẻ đẹp Sài Gòn - Edit by Nhóm 1
+            </p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {# Leaflet JS: XÓA THUỘC TÍNH INTEGRITY #}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+         crossorigin=""></script>
+    {% block scripts %}{% endblock %}
+</body>
 </html>
