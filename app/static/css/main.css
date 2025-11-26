@@ -17,8 +17,355 @@ body { background-color: #f7fbff; }
 	border-radius: 6px;
 }
 
-/* Điều chỉnh cho màn hình nhỏ (responsive) */
+/* --- CSS cho trang find_route.html --- */
+
+/* Custom navigation pills */
+.custom-nav-pills .nav-link {
+	border-radius: 8px;
+	font-weight: 500;
+	transition: all 0.3s ease;
+}
+
+.custom-nav-pills .nav-link.disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.custom-nav-pills .nav-link.active {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+}
+
+/* Route type selection cards */
+.route-type-card {
+	cursor: pointer;
+	border: 2px solid #e0e0e0;
+	transition: all 0.3s ease;
+	background: white;
+}
+
+.route-type-card:hover {
+	border-color: #007bff;
+	box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+	transform: translateY(-2px);
+}
+
+.route-type-card.active {
+	border-color: #007bff;
+	background: #f0f7ff;
+	box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+/* Info boxes for distance and duration */
+.info-box {
+	padding: 16px;
+	border-radius: 8px;
+	border: 1px solid #e0e0e0;
+	background: white;
+}
+
+.info-box.blue {
+	border-left: 4px solid #0d6efd;
+}
+
+.info-box.green {
+	border-left: 4px solid #198754;
+}
+
+.info-box .icon {
+	font-size: 2rem;
+	margin-right: 12px;
+}
+
+.info-box .label {
+	display: block;
+	font-size: 0.85rem;
+	color: #6c757d;
+	margin-bottom: 4px;
+}
+
+.info-box .value {
+	display: block;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #212529;
+}
+
+/* Timeline steps for waypoints */
+.timeline-steps {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
+}
+
+.timeline-steps li {
+	display: flex;
+	align-items: flex-start;
+	margin-bottom: 20px;
+	position: relative;
+}
+
+.timeline-steps li:not(:last-child)::before {
+	content: '';
+	position: absolute;
+	left: 15px;
+	top: 35px;
+	width: 2px;
+	height: calc(100% + 5px);
+	background: linear-gradient(to bottom, #007bff 0%, #6c757d 100%);
+	z-index: 0;
+}
+
+.timeline-steps li .icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: white;
+	border: 2px solid #6c757d;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 12px;
+	flex-shrink: 0;
+	z-index: 1;
+	position: relative;
+}
+
+.timeline-steps li.start .icon {
+	background: #198754;
+	border-color: #198754;
+	color: white;
+}
+
+.timeline-steps li.end .icon {
+	background: #dc3545;
+	border-color: #dc3545;
+	color: white;
+}
+
+.timeline-steps li.middle .icon {
+	background: #0d6efd;
+	border-color: #0d6efd;
+	color: white;
+}
+
+.timeline-steps li .content {
+	flex: 1;
+	padding-top: 4px;
+}
+
+.timeline-steps li .content .name {
+	display: block;
+	font-weight: 600;
+	color: #212529;
+	margin-bottom: 2px;
+}
+
+/* Custom dark button */
+.btn-dark-custom {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.btn-dark-custom:hover {
+	background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+	color: white;
+}
+
+/* --- CSS cho trang display_map.html --- */
+
+/* Map container */
+.map-container {
+	height: 500px;
+	width: 100%;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+/* POI List styles */
+.poi-list-container {
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.poi-item {
+	display: flex;
+	align-items: center;
+	padding: 12px;
+	margin-bottom: 8px;
+	background: white;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.poi-item:hover {
+	background: #f8f9fa;
+	border-color: #007bff;
+	box-shadow: 0 2px 8px rgba(0,123,255,0.1);
+}
+
+.poi-color-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	margin-right: 12px;
+	flex-shrink: 0;
+}
+
+.poi-details {
+	flex-grow: 1;
+}
+
+.poi-name {
+	margin: 0;
+	font-weight: 600;
+	color: #333;
+}
+
+.poi-quan {
+	margin: 0;
+	color: #666;
+}
+
+/* Filter buttons */
+.filter-btn {
+	padding: 6px 16px;
+	border: 1px solid #ddd;
+	background: white;
+	border-radius: 20px;
+	font-size: 14px;
+	transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+	background: #f8f9fa;
+	border-color: #007bff;
+}
+
+.filter-btn.active {
+	background: #007bff;
+	color: white;
+	border-color: #007bff;
+}
+
+/* Legend */
+.legend-area {
+	margin-top: 16px;
+	padding-top: 16px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.legend-dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	margin-right: 6px;
+}
+
+/* Color dot classes */
+.color-dot-red { background-color: #dc3545; }
+.color-dot-blue { background-color: #0d6efd; }
+.color-dot-purple { background-color: #6f42c1; }
+.color-dot-orange { background-color: #fd7e14; }
+.color-dot-green { background-color: #198754; }
+.color-dot-gray { background-color: #6c757d; }
+
+/* Marker number styles */
+.marker-number {
+	background-color: #007bff;
+	color: white;
+	border-radius: 50%;
+	width: 25px;
+	height: 25px;
+	line-height: 25px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 11px;
+	border: 2px solid white;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Custom div icon container */
+.custom-div-icon {
+	background: none;
+	border: none;
+}
+
+/* Map tabs */
+.map-tabs-container {
+	background: white;
+	padding: 0 20px;
+	border-bottom: 1px solid #dee2e6;
+	margin-bottom: 20px;
+}
+
+.map-tab {
+	padding: 12px 20px;
+	color: #666;
+	border: none;
+	border-bottom: 3px solid transparent;
+	transition: all 0.3s ease;
+}
+
+.map-tab:hover {
+	color: #007bff;
+	background: #f8f9fa;
+}
+
+.map-tab.active {
+	color: #007bff;
+	border-bottom-color: #007bff;
+	font-weight: 600;
+}
+
+/* Page header styles */
+.page-top-block {
+	margin-bottom: 20px;
+}
+
+.custom-app-header-content {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 20px;
+	border-radius: 12px;
+	margin-bottom: 0;
+	color: white;
+}
+
+.page-main-title {
+	margin-bottom: 12px;
+}
+
+.header-app-info {
+	margin-bottom: 8px;
+}
+
+.design-by-bar {
+	font-size: 12px;
+	opacity: 0.9;
+}
+
+
 @media (max-width: 992px) {
 	#mini-map { height: 200px !important; }
 	.diem-popup-img { width: 120px; height: 90px; }
+	.map-container { height: 350px; }
+	.poi-list-container { max-height: 300px; }
+	
+	.info-box .value {
+		font-size: 1.25rem;
+	}
+	
+	.timeline-steps li .icon {
+		width: 28px;
+		height: 28px;
+	}
 }

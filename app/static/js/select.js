@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const filterQuan = document.getElementById('filter-quan');
 	const filterLoai = document.getElementById('filter-loai');
-	// lưu ý: không cache các phần tử điểm ở đây vì DOM có thể được cập nhật; hãy truy vấn mới bên trong hàm filter
 	const selectedCountEl = document.getElementById('selected-count');
 	const totalTimeEl = document.getElementById('total-time');
 	const totalPointsEl = document.getElementById('total-points');
@@ -21,15 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			const showQ = !q || (qi + '') === (q + '');
 			const showL = !l || (li + '') === (l + '');
 			const shouldShow = (showQ && showL);
-			// dùng lớp tiện ích của Bootstrap để ẩn/hiện nhất quán
 			item.classList.toggle('d-none', !shouldShow);
-			// Nếu một phần tử trở nên ẩn, bỏ chọn checkbox của nó để bản tóm tắt chỉ tính các lựa chọn đang hiển thị
 			if (!shouldShow) {
 				const cb = item.querySelector('.select-diem');
 				if (cb && cb.checked) cb.checked = false;
 			}
 		});
-		// sau khi lọc, cập nhật tóm tắt lựa chọn để phản ánh các phần tử đang hiển thị
 		updateSummary();
 	}
 
@@ -74,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// hooks khởi tạo
 	if (filterQuan) filterQuan.addEventListener('change', function () { filterDiems(); refreshMarkers(); });
 	if (filterLoai) filterLoai.addEventListener('change', function () { filterDiems(); refreshMarkers(); });
-	// gán handler change lên document để bắt cả các checkbox thêm sau
+	// gán handler change lên document để bắt các checkbox thêm sau
 	document.addEventListener('change', function (e) {
 		if (e.target && e.target.classList && e.target.classList.contains('select-diem')) {
 			updateSummary();
@@ -115,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	filterDiems();
 	updateSummary();
 
-	// --- Khởi tạo mini-map Leaflet ---
+	// --- Khởi tạo mini-map ---
 	let map = null;
 	let markers = null;
 	let routeLayer = null; // lớp chứa tuyến đường đã vẽ
@@ -125,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			// tạo bản đồ
 			map = L.map(miniMapEl).setView([10.7769, 106.70098], 12);
 
-			// thêm lớp tile OSM
+			//lớp tile OSM
 			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
@@ -209,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 
-		// xây dựng danh sách toạ độ: OSRM muốn lon,lat; GraphHopper dùng lat,lon trong tham số point
+		// xây dựng danh sách toạ độ: OSRM (lon,lat); GraphHopper dùng lat,lon trong tham số point
 		const coords = [];
 		items.forEach(it => {
 			const lat = parseFloat(it.dataset.lat || '');
@@ -218,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 		if (coords.length < 2) return;
 
-		// thử server công cộng OSRM trước
+		// thử server public OSRM trước
 		const osrmCoordStr = coords.map(c => `${c.lng},${c.lat}`).join(';');
 		const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${osrmCoordStr}?overview=full&geometries=geojson`;
 		try {
@@ -248,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const ghKey = window.GH_API_KEY || (document.body && document.body.dataset && document.body.dataset.ghApiKey);
 		if (ghKey) {
 			try {
-				// GraphHopper mong đợi nhiều tham số point=lat,lon
 				const params = new URLSearchParams();
 				coords.forEach(c => params.append('point', `${c.lat},${c.lng}`));
 				params.set('vehicle', 'car');
@@ -260,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				const data = await resp.json();
 				if (data && data.paths && data.paths.length > 0) {
 					const path = data.paths[0];
-					// path.points.coordinates là mảng [lon,lat] (GeoJSON)
+					// path.points.coordinates là arr [lon,lat] (GeoJSON)
 					const coordsArr = (path.points && path.points.coordinates) || [];
 					const geojson = {
 						type: 'LineString',
@@ -285,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.warn('Routing failed: no route drawn (OSRM and GraphHopper unavailable)');
 	}
 
-	// gán nút tối ưu để cũng tính toán tuyến rõ ràng
+	// gán nút tối ưu để
 	if (optimizeBtn) {
 		optimizeBtn.addEventListener('click', function (e) {
 			e.preventDefault();
@@ -300,6 +295,5 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	// đảm bảo refreshMarkers tồn tại ngay cả khi map không khởi tạo được
 	window.refreshMarkers = refreshMarkers;
 });

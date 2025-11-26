@@ -63,6 +63,22 @@ class DiemThamQuan(db.Model):
 
     def __repr__(self):
         return f"<Diem {self.DiemID} {self.TenDiem}>"
+    
+    def to_dict(self):
+        """Chuyển đổi object thành dictionary để trả về JSON API"""
+        return {
+            'id': self.DiemID,
+            'name': self.TenDiem,
+            'description': self.MoTa,
+            'address': self.DiaChi,
+            'quan_id': self.QuanID,
+            'loai_id': self.LoaiID,
+            'lat': float(self.ViDo) if self.ViDo else None,
+            'lng': float(self.KinhDo) if self.KinhDo else None,
+            'open_time': self.GioMoCua.strftime('%H:%M') if self.GioMoCua else None,
+            'close_time': self.GioDongCua.strftime('%H:%M') if self.GioDongCua else None
+        }
+    
     @property
     def id(self):
         return self.DiemID
