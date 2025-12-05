@@ -1,6 +1,34 @@
 /* CSS cơ bản của dự án và điều chỉnh cho UI select_points */
-body { background-color: #f7fbff; }
-.card { border-radius: 12px; }
+/* Color Scheme từ Homepage:
+   - Primary: #4CAF50 (Green)
+   - Background Light: #E0F7FA
+   - Background Dark: #101c22
+   - Text: #2F4F4F
+*/
+
+:root {
+	--primary-color: #4CAF50;
+	--primary-hover: #45a049;
+	--primary-light: #81C784;
+	--primary-dark: #388E3C;
+	--background-light: #E0F7FA;
+	--text-dark: #2F4F4F;
+	--text-light: #6c757d;
+	--border-color: #e0e0e0;
+	--shadow-sm: 0 2px 8px rgba(76, 175, 80, 0.15);
+	--shadow-md: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+body { 
+	background-color: var(--background-light);
+	color: var(--text-dark);
+}
+
+.card { 
+	border-radius: 12px;
+	border: 1px solid var(--border-color);
+}
+
 .diem-item { cursor: pointer; }
 .diem-item label { cursor: pointer; }
 .diem-item .badge { font-size: 0.75rem; }
@@ -24,63 +52,65 @@ body { background-color: #f7fbff; }
 	border-radius: 8px;
 	font-weight: 500;
 	transition: all 0.3s ease;
+	color: var(--text-dark);
 }
 
-.custom-nav-pills .nav-link.disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
+.custom-nav-pills .nav-link:hover {
+	background-color: rgba(76, 175, 80, 0.1);
 }
 
 .custom-nav-pills .nav-link.active {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background-color: var(--primary-color);
 	color: white;
+	box-shadow: var(--shadow-md);
 }
 
 /* Route type selection cards */
 .route-type-card {
 	cursor: pointer;
-	border: 2px solid #e0e0e0;
+	border: 2px solid var(--border-color);
 	transition: all 0.3s ease;
 	background: white;
 }
 
 .route-type-card:hover {
-	border-color: #007bff;
-	box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+	border-color: var(--primary-color);
+	box-shadow: var(--shadow-sm);
 	transform: translateY(-2px);
 }
 
 .route-type-card.active {
-	border-color: #007bff;
-	background: #f0f7ff;
-	box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+	border-color: var(--primary-color);
+	background: rgba(76, 175, 80, 0.05);
+	box-shadow: var(--shadow-md);
 }
 
 /* Info boxes for distance and duration */
 .info-box {
 	padding: 16px;
 	border-radius: 8px;
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--border-color);
 	background: white;
 }
 
 .info-box.blue {
-	border-left: 4px solid #0d6efd;
+	border-left: 4px solid var(--primary-color);
 }
 
 .info-box.green {
-	border-left: 4px solid #198754;
+	border-left: 4px solid var(--primary-dark);
 }
 
 .info-box .icon {
 	font-size: 2rem;
 	margin-right: 12px;
+	color: var(--primary-color);
 }
 
 .info-box .label {
 	display: block;
 	font-size: 0.85rem;
-	color: #6c757d;
+	color: var(--text-light);
 	margin-bottom: 4px;
 }
 
@@ -88,7 +118,7 @@ body { background-color: #f7fbff; }
 	display: block;
 	font-size: 1.5rem;
 	font-weight: 700;
-	color: #212529;
+	color: var(--text-dark);
 }
 
 /* Timeline steps for waypoints */
@@ -113,7 +143,7 @@ body { background-color: #f7fbff; }
 	top: 35px;
 	width: 2px;
 	height: calc(100% + 5px);
-	background: linear-gradient(to bottom, #007bff 0%, #6c757d 100%);
+	background: linear-gradient(to bottom, var(--primary-color) 0%, var(--text-light) 100%);
 	z-index: 0;
 }
 
@@ -122,7 +152,7 @@ body { background-color: #f7fbff; }
 	height: 32px;
 	border-radius: 50%;
 	background: white;
-	border: 2px solid #6c757d;
+	border: 2px solid var(--text-light);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -133,8 +163,8 @@ body { background-color: #f7fbff; }
 }
 
 .timeline-steps li.start .icon {
-	background: #198754;
-	border-color: #198754;
+	background: var(--primary-color);
+	border-color: var(--primary-color);
 	color: white;
 }
 
@@ -145,8 +175,8 @@ body { background-color: #f7fbff; }
 }
 
 .timeline-steps li.middle .icon {
-	background: #0d6efd;
-	border-color: #0d6efd;
+	background: var(--primary-light);
+	border-color: var(--primary-light);
 	color: white;
 }
 
@@ -158,13 +188,13 @@ body { background-color: #f7fbff; }
 .timeline-steps li .content .name {
 	display: block;
 	font-weight: 600;
-	color: #212529;
+	color: var(--text-dark);
 	margin-bottom: 2px;
 }
 
 /* Custom dark button */
 .btn-dark-custom {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
 	color: white;
 	border: none;
 	font-weight: 600;
@@ -172,10 +202,32 @@ body { background-color: #f7fbff; }
 }
 
 .btn-dark-custom:hover {
-	background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+	background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
 	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+	box-shadow: var(--shadow-md);
 	color: white;
+}
+
+/* Primary button styles */
+.btn-primary {
+	background-color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
+}
+
+.btn-primary:hover {
+	background-color: var(--primary-hover) !important;
+	border-color: var(--primary-hover) !important;
+}
+
+.btn-outline-primary {
+	color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
+}
+
+.btn-outline-primary:hover {
+	background-color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
+	color: white !important;
 }
 
 /* --- CSS cho trang display_map.html --- */
@@ -200,7 +252,7 @@ body { background-color: #f7fbff; }
 	padding: 12px;
 	margin-bottom: 8px;
 	background: white;
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--border-color);
 	border-radius: 8px;
 	cursor: pointer;
 	transition: all 0.3s ease;
@@ -208,8 +260,8 @@ body { background-color: #f7fbff; }
 
 .poi-item:hover {
 	background: #f8f9fa;
-	border-color: #007bff;
-	box-shadow: 0 2px 8px rgba(0,123,255,0.1);
+	border-color: var(--primary-color);
+	box-shadow: var(--shadow-sm);
 }
 
 .poi-color-dot {
@@ -227,12 +279,12 @@ body { background-color: #f7fbff; }
 .poi-name {
 	margin: 0;
 	font-weight: 600;
-	color: #333;
+	color: var(--text-dark);
 }
 
 .poi-quan {
 	margin: 0;
-	color: #666;
+	color: var(--text-light);
 }
 
 /* Filter buttons */
@@ -246,21 +298,21 @@ body { background-color: #f7fbff; }
 }
 
 .filter-btn:hover {
-	background: #f8f9fa;
-	border-color: #007bff;
+	background: rgba(76, 175, 80, 0.05);
+	border-color: var(--primary-color);
 }
 
 .filter-btn.active {
-	background: #007bff;
+	background: var(--primary-color);
 	color: white;
-	border-color: #007bff;
+	border-color: var(--primary-color);
 }
 
 /* Legend */
 .legend-area {
 	margin-top: 16px;
 	padding-top: 16px;
-	border-top: 1px solid #e0e0e0;
+	border-top: 1px solid var(--border-color);
 }
 
 .legend-dot {
@@ -271,17 +323,17 @@ body { background-color: #f7fbff; }
 	margin-right: 6px;
 }
 
-/* Color dot classes */
+/* Color dot classes - keeping original colors for POI categories */
 .color-dot-red { background-color: #dc3545; }
 .color-dot-blue { background-color: #0d6efd; }
 .color-dot-purple { background-color: #6f42c1; }
 .color-dot-orange { background-color: #fd7e14; }
-.color-dot-green { background-color: #198754; }
+.color-dot-green { background-color: var(--primary-color); }
 .color-dot-gray { background-color: #6c757d; }
 
 /* Marker number styles */
 .marker-number {
-	background-color: #007bff;
+	background-color: var(--primary-color);
 	color: white;
 	border-radius: 50%;
 	width: 25px;
@@ -310,20 +362,20 @@ body { background-color: #f7fbff; }
 
 .map-tab {
 	padding: 12px 20px;
-	color: #666;
+	color: var(--text-light);
 	border: none;
 	border-bottom: 3px solid transparent;
 	transition: all 0.3s ease;
 }
 
 .map-tab:hover {
-	color: #007bff;
-	background: #f8f9fa;
+	color: var(--primary-color);
+	background: rgba(76, 175, 80, 0.05);
 }
 
 .map-tab.active {
-	color: #007bff;
-	border-bottom-color: #007bff;
+	color: var(--primary-color);
+	border-bottom-color: var(--primary-color);
 	font-weight: 600;
 }
 
@@ -333,7 +385,7 @@ body { background-color: #f7fbff; }
 }
 
 .custom-app-header-content {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
 	padding: 20px;
 	border-radius: 12px;
 	margin-bottom: 0;
@@ -351,6 +403,41 @@ body { background-color: #f7fbff; }
 .design-by-bar {
 	font-size: 12px;
 	opacity: 0.9;
+}
+
+/* Bootstrap overrides for primary color */
+.bg-primary {
+	background-color: var(--primary-color) !important;
+}
+
+.text-primary {
+	color: var(--primary-color) !important;
+}
+
+.border-primary {
+	border-color: var(--primary-color) !important;
+}
+
+/* Links */
+a {
+	color: var(--primary-color);
+	text-decoration: none;
+}
+
+a:hover {
+	color: var(--primary-hover);
+}
+
+/* Form controls focus */
+.form-control:focus,
+.form-select:focus {
+	border-color: var(--primary-color);
+	box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+/* Badges */
+.badge.bg-primary {
+	background-color: var(--primary-color) !important;
 }
 
 

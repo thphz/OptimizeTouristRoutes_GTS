@@ -4,9 +4,9 @@
 
 {% block content %}
 <style>
-    /* CSS cho marker số thứ tự tuyến đường (đã có trong main.css, chỉ nhắc lại) */
+    /* CSS cho marker số thứ tự tuyến đường */
     .marker-number {
-        background-color: #007bff;
+        background-color: #4CAF50;
         color: white;
         border-radius: 50%;
         width: 25px;
@@ -18,26 +18,19 @@
         border: 2px solid white;
     }
 </style>
-<nav class="map-tabs-container">
-    <ul class="nav nav-tabs map-tabs justify-content-start border-0">
-        <li class="nav-item">
-            <a class="nav-link map-tab active" href="#" onclick="calculateRoute(); return false;"><i class="fas fa-route me-1"></i> Lộ Trình Tối Ưu</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link map-tab" href="#"><i class="fas fa-map me-1"></i> Bản Đồ</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link map-tab" href="#"><i class="fas fa-search me-1"></i> Tìm Đường</a>
-        </li>
-    </ul>
-</nav>
-
 
 <div class="container-fluid content-inner-area">
     <div class="card map-card mb-3 border-0 shadow-sm">
         <div class="card-body p-3">
-            <h3 class="h6 fw-bold mb-1">Bản Đồ Thành Phố Hồ Chí Minh</h3>
-            <p class="text-muted small map-subtitle">Nhấp vào các điểm đánh dấu để xem thông tin chi tiết</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h3 class="h6 fw-bold mb-1">Bản Đồ Thành Phố Hồ Chí Minh</h3>
+                    <p class="text-muted small map-subtitle mb-0">Nhấp vào các điểm đánh dấu để xem thông tin chi tiết</p>
+                </div>
+                <button type="button" class="btn btn-primary d-flex align-items-center" onclick="calculateRoute()">
+                    <i class="fas fa-route me-2"></i> Lộ Trình Tối Ưu
+                </button>
+            </div>
 
             <div id="mapid" class="map-container">
                 {# Bản đồ Leaflet sẽ được khởi tạo tại đây #}
@@ -300,15 +293,33 @@
 
             const data = await response.json();
 
-            // 1. Vẽ tuyến đường mới (Polyline)
-            const orderedCoords = data.route_order.map(index => [selectedPoints[index].lat, selectedPoints[index].lng]);
+            // Tạo map từ ID sang điểm để dễ tra cứu
+            const pointsById = {};
+            selectedPoints.forEach(p => {
+                pointsById[p.id] = p;
+            });
 
-            routePolyline = L.polyline(orderedCoords, { color: 'red', weight: 5, opacity: 0.7 }).addTo(map);
+            // 1. Vẽ tuyến đường mới (Polyline) với màu xanh lá
+            const orderedCoords = data.route_order.map(id => {
+                const point = pointsById[id];
+                if (!point) {
+                    console.error(`Không tìm thấy điểm với ID: ${id}`);
+                    return null;
+                }
+                return [point.lat, point.lng];
+            }).filter(coord => coord !== null);
+
+            if (orderedCoords.length === 0) {
+                throw new Error('Không thể tạo tuyến đường. Vui lòng thử lại.');
+            }
+
+            routePolyline = L.polyline(orderedCoords, { color: '#4CAF50', weight: 5, opacity: 0.7 }).addTo(map);
             map.fitBounds(routePolyline.getBounds());
 
             // 2. Thêm lại markers theo thứ tự tuyến đường
-            data.route_order.forEach((pointIndex, i) => {
-                const point = selectedPoints[pointIndex];
+            data.route_order.forEach((pointId, i) => {
+                const point = pointsById[pointId];
+                if (!point) return;
 
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',

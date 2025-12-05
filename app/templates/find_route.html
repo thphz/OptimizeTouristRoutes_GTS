@@ -3,23 +3,7 @@
 
 {% block content %}
 
-<ul class="nav nav-pills nav-fill mb-4 custom-nav-pills" id="pills-tab">
-    <li class="nav-item">
-        <a class="nav-link disabled" href="#">
-            <i class="bi bi-person-check-fill me-2"></i>Lộ Trình Tối Ưu (GTS)
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link disabled" href="#">
-            <i class="bi bi-map-fill me-2"></i>Bản Đồ
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="#">
-            <i class="bi bi-compass-fill me-2"></i>Tìm Đường (A-B)
-        </a>
-    </li>
-</ul>
+
 
 <div class="row g-4">
     <div class="col-lg-5">
@@ -33,7 +17,7 @@
                 <p class="card-subtitle mb-4 text-muted">Nhập điểm đi và điểm đến để tìm tuyến đường tối ưu</p>
                 <div class="mb-3">
                     <label for="start-point" class="form-label fw-bold">
-                        <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.7rem;"></i>
+                        <i class="bi bi-circle-fill me-2" style="font-size: 0.7rem; color: #4CAF50;"></i>
                         Điểm Xuất Phát
                     </label>
                     <select id="start-point" class="form-select form-select-lg bg-light border-0 py-3">
@@ -62,7 +46,7 @@
                     </div>
                     <div class="card route-type-card p-3" data-value="shortest">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-sign-turn-right-fill fs-4 text-success me-3"></i>
+                            <i class="bi bi-sign-turn-right-fill fs-4 me-3" style="color: #4CAF50;"></i>
                             <div>
                                 <strong class="d-block">Ngắn Nhất</strong>
                                 <small class="text-muted">Đề xuất quãng đường ngắn nhất.</small>

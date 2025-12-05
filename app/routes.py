@@ -13,7 +13,12 @@ class Obj:
 
 @app.route('/')
 def index():
-    return redirect(url_for('select_points'))
+    return render_template('homepage.html')
+
+
+@app.route('/homepage')
+def homepage():
+    return render_template('homepage.html')
 
 
 @app.route('/select_points', methods=['GET', 'POST'])
@@ -159,21 +164,37 @@ def api_map_data():
 @app.route('/api/route_optimize', methods=['POST'])
 def api_route_optimize():
     try:
+        from app.algorithms.gts import gts_optimize
+        
         data = request.get_json()
         points = data.get('points', [])
+        start_point_id = data.get('start_point_id')
+        return_to_start = data.get('return_to_start', False)
+        use_osrm = data.get('use_osrm', True)
        
         if len(points) < 2:
             return jsonify({"error": "Vui lòng chọn ít nhất 2 điểm để tìm tuyến đường."}), 400
-
-        coords = [(p["lat"], p["lng"]) for p in points]
-    
-        # Dữ liệu mô phỏng
-        path = list(range(len(coords)))
-        total_distance = len(coords) * 1.5 
+        
+        # Sử dụng thuật toán GTS để tối ưu tuyến đường
+        result = gts_optimize(
+            points=points,
+            start_point_id=start_point_id,
+            return_to_start=return_to_start,
+            use_osrm=use_osrm,
+            avg_speed_kmh=30.0,
+            visit_duration_min=60
+        )
+        
+        if 'error' in result:
+            return jsonify(result), 400
     
         return jsonify({
-            "route_order": path,
-            "total_distance": round(total_distance, 2),
+            "route_order": result['route_order'],
+            "total_distance": result['total_distance'],
+            "waypoints": result['waypoints'],
+            "duration_info": result['duration_info'],
+            "method": result.get('method', 'greedy'),
+            "coordinates": [[p['lat'], p['lng']] for p in result['route']]
         })
         
     except Exception as e:
@@ -217,6 +238,7 @@ def api_find_route():
 
     try:
         from app.models import DiemThamQuan
+        from app.algorithms.gts import gts_optimize
         
         start_point = DiemThamQuan.query.get(start_point_id)
         end_point = DiemThamQuan.query.get(end_point_id)
@@ -228,20 +250,54 @@ def api_find_route():
         end_point_name = end_point.TenDiem
         
         if route_type == 'scenic':
-            dummy_gts_route = {
-                'distance_km': 51.2, 
-                'duration_min': 148,
-                'traffic': 'Giao thông không áp dụng.',
-                'steps': ['Lộ trình tham quan vòng quanh thành phố.'],
-                'waypoints_timeline': [
-                    {'name': start_point_name, 'detail': 'Xuất phát'},
-                    {'name': 'Dinh Độc Lập (Giả)'},
-                    {'name': '... (và 8 điểm khác)'},
-                    {'name': start_point_name, 'detail': 'Đích đến'}
-                ],
-                'coordinates': [ [10.7769, 106.6955], [10.7714, 106.7038] ]
-            }
-            return jsonify(dummy_gts_route)
+            # Sử dụng GTS để tối ưu tuyến đường tham quan nhiều điểm
+            # Lấy các điểm lân cận để tạo tuyến tham quan
+            try:
+                all_points = DiemThamQuan.query.limit(10).all()
+                points_data = [p.to_dict() for p in all_points]
+                
+                result = gts_optimize(
+                    points=points_data,
+                    start_point_id=start_point_id,
+                    return_to_start=True,
+                    use_osrm=True,
+                    avg_speed_kmh=25.0,
+                    visit_duration_min=45
+                )
+                
+                # Tạo coordinates từ route
+                coordinates = [[p['lat'], p['lng']] for p in result.get('route', [])]
+                
+                gts_route = {
+                    'distance_km': result.get('total_distance', 0), 
+                    'duration_min': result.get('duration_info', {}).get('total_time_min', 0),
+                    'travel_time_min': result.get('duration_info', {}).get('travel_time_min', 0),
+                    'visit_time_min': result.get('duration_info', {}).get('visit_time_min', 0),
+                    'traffic': f"Tối ưu bằng {result.get('method', 'GTS')}.",
+                    'steps': [f"Tham quan {len(result.get('route', []))} điểm"],
+                    'waypoints_timeline': result.get('waypoints', []),
+                    'coordinates': coordinates,
+                    'method': result.get('method', 'greedy')
+                }
+                return jsonify(gts_route)
+                
+            except Exception as e:
+                app.logger.exception('Error using GTS for scenic route: %s', e)
+                # Fallback về dữ liệu mô phỏng cũ
+                dummy_gts_route = {
+                    'distance_km': 51.2, 
+                    'duration_min': 148,
+                    'traffic': 'Giao thông không áp dụng.',
+                    'steps': ['Lộ trình tham quan vòng quanh thành phố.'],
+                    'waypoints_timeline': [
+                        {'name': start_point_name, 'detail': 'Xuất phát'},
+                        {'name': 'Dinh Độc Lập'},
+                        {'name': '... (và 8 điểm khác)'},
+                        {'name': start_point_name, 'detail': 'Đích đến'}
+                    ],
+                    'coordinates': [ [10.7769, 106.6955], [10.7714, 106.7038] ]
+                }
+                return jsonify(dummy_gts_route)
         
         else: 
             coords_start = f"{start_point.KinhDo},{start_point.ViDo}"

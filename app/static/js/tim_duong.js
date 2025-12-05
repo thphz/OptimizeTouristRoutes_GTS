@@ -68,7 +68,7 @@
 
         resultsContent.innerHTML = `
             <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; color: #4CAF50 !important;">
                     <span class="visually-hidden">Đang tìm đường...</span>
                 </div>
                 <h5 class="ms-3 text-muted">Đang tìm đường...</h5>
@@ -106,7 +106,7 @@
         if (type !== 'scenic' && data.steps && data.steps.length > 0) {
             stepsHtml = data.steps.map((step, index) => `
                 <div class="d-flex align-items-center p-2">
-                    <span class="badge bg-primary rounded-pill me-3" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;">${index + 1}</span>
+                    <span class="badge rounded-pill me-3" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background-color: #4CAF50;">${index + 1}</span>
                     <span>${step}</span>
                 </div>
             `).join('');
@@ -122,7 +122,7 @@
                 if (index === 0) {
                     stepClass += ' start';
                     iconClass = 'bi-circle-fill';
-                    detailHtml = `<small class="text-success fw-bold">${point.detail || 'Xuất phát'}</small>`;
+                    detailHtml = `<small class="fw-bold" style="color: #4CAF50;">${point.detail || 'Xuất phát'}</small>`;
                 } else if (index === data.waypoints_timeline.length - 1) {
                     stepClass += ' end';
                     iconClass = 'bi-geo-alt-fill';
@@ -146,7 +146,7 @@
 
         let finalHtml = `
             <div class="d-flex align-items-center mb-1">
-                <i class="bi bi-check-circle-fill text-success me-2 fs-5"></i>
+                <i class="bi bi-check-circle-fill me-2 fs-5" style="color: #4CAF50;"></i>
                 <h5 class="card-title mb-0">Kết Quả Tìm Đường</h5>
             </div>
             <p class="card-subtitle mb-4 text-muted">Thông tin chi tiết về tuyến đường ${type} được đề xuất.</p>
@@ -156,7 +156,7 @@
                 <div class="col-6">
                     <div class="info-box blue">
                         <div class="d-flex">
-                            <i class="bi bi-signpost-split-fill icon text-primary"></i>
+                            <i class="bi bi-signpost-split-fill icon"></i>
                             <div>
                                 <span class="label">Khoảng Cách</span>
                                 <span class="value">${data.distance_km} km</span>
@@ -167,7 +167,7 @@
                 <div class="col-6">
                     <div class="info-box green">
                         <div class="d-flex">
-                            <i class="bi bi-clock-fill icon text-success"></i>
+                            <i class="bi bi-clock-fill icon"></i>
                             <div>
                                 <span class="label">Thời Gian</span>
                                 <span class="value">${data.duration_min} phút</span>
