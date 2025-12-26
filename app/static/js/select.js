@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const selectedList = document.getElementById('selected-summary-list');
 	const optimizeBtn = document.getElementById('optimize-btn');
 	const form = document.getElementById('select-form');
-	const resetBtn = document.getElementById('reset-btn');
+	const selectAllBtn = document.getElementById('select-all-btn');
 	const clearBtn = document.getElementById('clear-selection');
 
 	function filterDiems() {
@@ -93,11 +93,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	if (resetBtn) resetBtn.addEventListener('click', function () {
-		document.querySelectorAll('.select-diem').forEach(cb => cb.checked = false);
-		if (filterQuan) filterQuan.value = '';
-		if (filterLoai) filterLoai.value = '';
-		filterDiems();
+	if (selectAllBtn) selectAllBtn.addEventListener('click', function () {
+		const visibleItems = Array.from(document.querySelectorAll('.diem-item')).filter(item => isVisibleItem(item));
+		visibleItems.forEach(item => {
+			const cb = item.querySelector('.select-diem');
+			if (cb) cb.checked = true;
+		});
 		updateSummary();
 		refreshMarkers();
 	});
@@ -290,14 +291,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				alert('Vui lòng chọn ít nhất 2 điểm để vẽ tuyến đường.');
 				return;
 			}
-			
+
 			// Lấy thông tin điểm đã chọn
 			const items = selectedCbs.map(cb => cb.closest('.diem-item'));
 			const points = items.map(item => ({
 				id: item.querySelector('.select-diem').value,
 				lat: parseFloat(item.dataset.lat),
 				lng: parseFloat(item.dataset.lng),
-				name: item.querySelector('label').textContent.trim()
+				name: item.querySelector('label').textContent.trim(),
+				duration: parseInt(item.dataset.duration || '60', 10)
 			}));
 
 			// Hiển thị loading
@@ -309,10 +311,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				const response = await fetch('/api/route_optimize', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ 
+					body: JSON.stringify({
 						points: points,
 						use_osrm: true,
-						return_to_start: false
+						use_multi_start: true,  // Bật Multi-Start để tối ưu tốt hơn
+						return_to_start: true  // Bật chế độ quay về điểm đầu
 					})
 				});
 
@@ -322,6 +325,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 
 				const data = await response.json();
+				
+				// Debug log để kiểm tra data
+				console.log('API Response:', data);
+				console.log('multi_start_used:', data.multi_start_used);
+				console.log('attempts:', data.attempts);
+				console.log('method:', data.method);
 
 				// Tạo map từ ID sang item để dễ tra cứu
 				const itemsById = {};
@@ -339,10 +348,16 @@ document.addEventListener('DOMContentLoaded', function () {
 				// Vẽ route đã tối ưu trên map
 				await drawOptimizedRoute(optimizedItems, data);
 
-				// Hiển thị thông báo thành công
+				// Hiển thị thông báo thành công với thông tin Multi-Start
 				const statusBox = document.getElementById('status-box');
 				if (statusBox) {
-					statusBox.textContent = `✓ Đã tối ưu! Khoảng cách: ${data.total_distance} km, Thời gian: ${data.duration_info.total_time_hours.toFixed(1)} giờ`;
+					const methodInfo = data.multi_start_used
+						? ` (Multi-Start: đã thử ${data.attempts} điểm xuất phát)`
+						: '';
+					const routeInfo = data.return_to_start
+						? `Đã tối ưu! Khoảng cách: ${data.total_distance} km (quay về điểm xuất phát), Thời gian: ${data.duration_info.total_time_hours.toFixed(1)} giờ${methodInfo}`
+						: `Đã tối ưu! Khoảng cách: ${data.total_distance} km, Thời gian: ${data.duration_info.total_time_hours.toFixed(1)} giờ${methodInfo}`;
+					statusBox.textContent = routeInfo;
 					statusBox.classList.remove('d-none', 'alert-danger');
 					statusBox.classList.add('alert-success');
 				}
@@ -350,10 +365,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			} catch (error) {
 				console.error('Lỗi tối ưu:', error);
 				alert(`Lỗi: ${error.message}`);
-				
+
 				const statusBox = document.getElementById('status-box');
 				if (statusBox) {
-					statusBox.textContent = `✗ Lỗi: ${error.message}`;
+					statusBox.textContent = `Lỗi: ${error.message}`;
 					statusBox.classList.remove('d-none', 'alert-success');
 					statusBox.classList.add('alert-danger');
 				}
@@ -370,22 +385,51 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!selectedList) return;
 		
 		selectedList.innerHTML = '';
-		let totalMinutes = 0;
 
 		optimizedItems.forEach((item, idx) => {
 			const name = item.querySelector('label').textContent.trim();
-			const duration = parseInt(item.dataset.duration || '60', 10);
-			totalMinutes += duration;
+			
+			// Lấy thông tin từ waypoints (bao gồm duration và arrival_min)
+			const waypoint = data.waypoints && data.waypoints[idx];
+			const duration = waypoint ? waypoint.duration : parseInt(item.dataset.duration || '60', 10);
+			const arrivalMin = waypoint ? waypoint.arrival_min : 0;
+			
+			// Chuyển đổi arrival_min thành giờ:phút
+			const arrivalHours = Math.floor(arrivalMin / 60);
+			const arrivalMins = Math.round(arrivalMin % 60);
+			const arrivalTimeStr = `${arrivalHours}h${arrivalMins.toString().padStart(2, '0')}`;
 
 			const li = document.createElement('li');
 			li.className = 'mb-2 p-2 border rounded d-flex align-items-center gap-2';
 			li.innerHTML = `<div class="badge bg-success text-white">${idx + 1}</div>
 						<div class="flex-grow-1">
 							<div class="fw-semibold">${name}</div>
-							<small class="text-muted">${duration} phút</small>
+							<small class="text-muted">${duration} phút · Đến: ${arrivalTimeStr}</small>
 						</div>`;
 			selectedList.appendChild(li);
 		});
+
+		// Thêm mục "Quay về điểm xuất phát" nếu có
+		if (data.return_to_start && optimizedItems.length > 0) {
+			const firstItem = optimizedItems[0];
+			const firstName = firstItem.querySelector('label').textContent.trim();
+			
+			// Lấy thời gian đến của điểm quay về (waypoint cuối cùng)
+			const lastWaypoint = data.waypoints && data.waypoints[data.waypoints.length - 1];
+			const returnArrivalMin = lastWaypoint ? lastWaypoint.arrival_min : 0;
+			const returnHours = Math.floor(returnArrivalMin / 60);
+			const returnMins = Math.round(returnArrivalMin % 60);
+			const returnTimeStr = `${returnHours}h${returnMins.toString().padStart(2, '0')}`;
+			
+			const li = document.createElement('li');
+			li.className = 'mb-2 p-2 border rounded d-flex align-items-center gap-2';
+			li.innerHTML = `<div class="badge bg-info text-white">↺</div>
+						<div class="flex-grow-1">
+							<div class="fw-semibold">${firstName}</div>
+							<small class="text-muted">Quay về · Đến: ${returnTimeStr}</small>
+						</div>`;
+			selectedList.appendChild(li);
+		}
 
 		// Cập nhật thời gian với dữ liệu từ API
 		if (data.duration_info) {
@@ -409,12 +453,17 @@ document.addEventListener('DOMContentLoaded', function () {
 		markers.clearLayers();
 		
 		const bounds = [];
+		const routeCoordinates = []; // Mảng tọa độ cho polyline
+		
 		optimizedItems.forEach((item, idx) => {
 			const lat = parseFloat(item.dataset.lat);
 			const lng = parseFloat(item.dataset.lng);
 			const name = item.querySelector('label').textContent.trim();
 			
 			if (!isNaN(lat) && !isNaN(lng)) {
+				// Lưu tọa độ cho route
+				routeCoordinates.push([lat, lng]);
+				
 				// Tạo custom icon với số thứ tự
 				const divIcon = L.divIcon({
 					className: 'custom-div-icon',
@@ -430,22 +479,42 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
+		// Nếu return_to_start = true, thêm điểm đầu vào cuối để đóng vòng
+		if (data.return_to_start && routeCoordinates.length > 1) {
+			routeCoordinates.push(routeCoordinates[0]);
+		}
+
 		// Sử dụng coordinates từ API response hoặc tạo từ optimized items
 		if (data.coordinates && data.coordinates.length > 1) {
 			// Vẽ route từ coordinates API trả về
-			const geojson = {
-				type: 'LineString',
-				coordinates: data.coordinates.map(coord => [coord[1], coord[0]]) // [lng, lat]
-			};
-			routeLayer = L.geoJSON(geojson, { 
-				style: { color: '#28a745', weight: 4, opacity: 0.8 }
-			}).addTo(map);
-		} else if (bounds.length > 1) {
-			// Fallback: vẽ đường thẳng giữa các điểm
-			routeLayer = L.polyline(bounds, { 
+			let apiCoords = data.coordinates.map(coord => [coord[0], coord[1]]); // [lat, lng]
+			
+			// Nếu return_to_start = true và chưa có điểm cuối nối về đầu
+			if (data.return_to_start && apiCoords.length > 1) {
+				const firstCoord = apiCoords[0];
+				const lastCoord = apiCoords[apiCoords.length - 1];
+				
+				// Kiểm tra nếu điểm cuối chưa trùng với điểm đầu
+				const tolerance = 0.0001;
+				if (Math.abs(firstCoord[0] - lastCoord[0]) > tolerance || 
+					Math.abs(firstCoord[1] - lastCoord[1]) > tolerance) {
+					apiCoords.push(firstCoord);
+				}
+			}
+			
+			routeLayer = L.polyline(apiCoords, { 
 				color: '#28a745', 
 				weight: 4, 
-				opacity: 0.8 
+				opacity: 0.8,
+				dashArray: data.return_to_start ? null : '10, 5'
+			}).addTo(map);
+		} else if (routeCoordinates.length > 1) {
+			// Fallback: vẽ đường thẳng giữa các điểm
+			routeLayer = L.polyline(routeCoordinates, { 
+				color: '#28a745', 
+				weight: 4, 
+				opacity: 0.8,
+				dashArray: data.return_to_start ? null : '10, 5'
 			}).addTo(map);
 		}
 
@@ -458,7 +527,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (routeLayer && data.total_distance) {
 			const distanceKm = data.total_distance;
 			const durationMin = Math.round(data.duration_info.travel_time_min);
-			routeLayer.bindPopup(`<div class="fw-semibold">Lộ trình tối ưu (GTS)</div><div>${distanceKm} km · ${durationMin} phút di chuyển</div>`);
+			const routeInfo = data.return_to_start 
+				? `Lộ trình tối ưu (GTS)<br>${distanceKm} km · ${durationMin} phút di chuyển<br><small class="text-success">↺ Quay về điểm xuất phát</small>`
+				: `Lộ trình tối ưu (GTS)<br>${distanceKm} km · ${durationMin} phút di chuyển`;
+			routeLayer.bindPopup(`<div class="fw-semibold">${routeInfo}</div>`);
 		}
 	}
 

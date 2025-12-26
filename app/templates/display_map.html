@@ -283,7 +283,10 @@
             const response = await fetch('/api/route_optimize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ points: selectedPoints })
+                body: JSON.stringify({ 
+                    points: selectedPoints,
+                    return_to_start: true  // Luôn quay về điểm xuất phát
+                })
             });
 
             if (!response.ok) {
@@ -313,6 +316,11 @@
                 throw new Error('Không thể tạo tuyến đường. Vui lòng thử lại.');
             }
 
+            // Nếu return_to_start = true, thêm điểm đầu vào cuối để đóng vòng
+            if (data.return_to_start && orderedCoords.length > 1) {
+                orderedCoords.push(orderedCoords[0]);
+            }
+
             routePolyline = L.polyline(orderedCoords, { color: '#4CAF50', weight: 5, opacity: 0.7 }).addTo(map);
             map.fitBounds(routePolyline.getBounds());
 
@@ -334,7 +342,11 @@
                 currentMarkers.push(marker);
             });
 
-            alert(`Đã tìm được tuyến đường tối ưu với tổng khoảng cách: ${data.total_distance} km.`);
+            const routeInfo = data.return_to_start 
+                ? `Đã tìm được tuyến đường tối ưu (quay về điểm xuất phát)\nTổng khoảng cách: ${data.total_distance} km`
+                : `Đã tìm được tuyến đường tối ưu\nTổng khoảng cách: ${data.total_distance} km`;
+            
+            alert(routeInfo);
 
         } catch (error) {
             console.error("Lỗi khi tối ưu tuyến đường:", error);

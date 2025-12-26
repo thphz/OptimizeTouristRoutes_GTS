@@ -440,6 +440,63 @@ a:hover {
 	background-color: var(--primary-color) !important;
 }
 
+/* --- CSS cho trang quản lý địa điểm --- */
+
+.table {
+	background: white;
+}
+
+.table thead th {
+	border-top: none;
+	border-bottom: 2px solid var(--border-color);
+	font-weight: 600;
+	color: var(--text-dark);
+}
+
+.table tbody td {
+	vertical-align: middle;
+	padding: 12px;
+}
+
+.table-hover tbody tr:hover {
+	background-color: rgba(76, 175, 80, 0.05);
+}
+
+.btn-sm {
+	padding: 4px 10px;
+	font-size: 0.875rem;
+}
+
+.btn-info {
+	background-color: #0dcaf0;
+	border-color: #0dcaf0;
+}
+
+.btn-info:hover {
+	background-color: #0bb5d8;
+	border-color: #0bb5d8;
+}
+
+.modal-header {
+	background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+	color: white;
+}
+
+.modal-header .btn-close {
+	filter: brightness(0) invert(1);
+}
+
+.form-label {
+	font-weight: 500;
+	color: var(--text-dark);
+	margin-bottom: 0.5rem;
+}
+
+.spinner-border {
+	width: 2rem;
+	height: 2rem;
+}
+
 
 @media (max-width: 992px) {
 	#mini-map { height: 200px !important; }
@@ -454,5 +511,14 @@ a:hover {
 	.timeline-steps li .icon {
 		width: 28px;
 		height: 28px;
+	}
+	
+	.table {
+		font-size: 0.875rem;
+	}
+	
+	.table thead th,
+	.table tbody td {
+		padding: 8px;
 	}
 }

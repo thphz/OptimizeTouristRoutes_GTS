@@ -71,6 +71,11 @@
 						<i class="bi bi-compass-fill me-2"></i>Tìm Đường (A-B)
 					</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link {% if request.endpoint == 'manage_locations' %}active{% endif %}" href="{{ url_for('manage_locations') }}">
+						<i class="bi bi-gear-fill me-2"></i>Quản Lý Địa Điểm
+					</a>
+				</li>
 			</ul>
 		</div>
 		<main class="container mb-5">

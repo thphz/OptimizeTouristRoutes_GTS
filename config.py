@@ -36,7 +36,7 @@ if not odbc_conn:
 		r"Server=tcp:optimizetouristroutes.database.windows.net,1433;"
 		r"Database=OptimizeTouristRoutesDB;"
 		f"Uid=thphz363;Pwd={db_password};"
-		r"Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+		r"Encrypt=yes;TrustServerCertificate=no;"
 	)
 
 # Mã hóa (URL-encode) chuỗi kết nối ODBC

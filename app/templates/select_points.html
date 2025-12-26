@@ -36,12 +36,10 @@
 					{{ csrf_token() if csrf_token is defined else "" }}
 					<div id="diem-list" class="list-group">
 						{% for diem in diems %}
-						{# tính display_duration: ưu tiên _computed_duration nếu không rỗng, ngược lại dùng diem.duration #}
-						{% set display_duration = (diem._computed_duration if diem._computed_duration is not none else (diem.duration|default(60))) %}
 						<div class="list-group-item list-group-item-action mb-2 d-flex align-items-center diem-item" 
 						 data-quan-id="{{ diem.quan_id if diem.quan_id is defined else (diem.quan.id if diem.quan is defined else '') }}"
 						 data-loai-id="{{ diem.loai_id if diem.loai_id is defined else (diem.loai.id if diem.loai is defined else '') }}"
-						 data-duration="{{ display_duration }}"
+						 data-duration="{{ diem.duration|default(60) }}"
 						 data-lat="{{ diem.vi_do|default('') }}"
 						 data-lng="{{ diem.kinh_do|default('') }}"
 						 data-image="{{ diem.image_url|default('') }}">
@@ -52,7 +50,7 @@
 							<label for="diem-{{ diem.id }}" class="mb-1 fw-semibold">{{ diem.ten }}</label>
 							<div class="small text-muted">
 								<span class="badge bg-light text-dark me-2">{{ (diem.quan.ten if diem.quan is defined else '') }}</span>
-								<i class="bi bi-clock"></i> {{ display_duration }} phút
+								<i class="bi bi-clock"></i> {{ diem.duration|default(60) }} phút
 							</div>
 						</div>
 						</div>
@@ -66,7 +64,9 @@
 							<i class="bi bi-arrow-up-right-circle me-2"></i>
 							Tối Ưu Hóa Lộ Trình (<span id="selected-count">0</span> điểm)
 						</button>
-						<button type="button" id="reset-btn" class="btn btn-outline-secondary">Làm mới</button>
+						<button type="button" id="select-all-btn" class="btn btn-outline-success">
+							<i class="bi bi-check-all"></i> Chọn tất cả
+						</button>
 					</div>
 				</form>
 			</div>
