@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>{% block title %}Du Lịch TP.HCM{% endblock %}</title>
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-" crossorigin="anonymous">
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+		
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+		<!-- Leaflet CSS -->
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+		
+		<style>
+			/* Override Bootstrap primary color to match homepage green */
+			:root {
+				--bs-primary: #4CAF50;
+				--bs-primary-rgb: 76, 175, 80;
+			}
+			
+			.bg-primary {
+				background-color: #4CAF50 !important;
+			}
+			
+			header.bg-primary {
+				background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%) !important;
+			}
+		</style>
+		
+		{% block head %}{% endblock %}
+	</head>
+	<body>
+		<header class="bg-primary text-white py-3 mb-4 shadow-sm">
+			<div class="container d-flex align-items-center justify-content-between">
+				<a href="{{ url_for('homepage') }}" class="d-flex align-items-center text-white text-decoration-none">
+					<i class="bi bi-geo-alt-fill fs-3 me-2"></i>
+					<div>
+						<h5 class="mb-0">Hướng Dẫn Du Lịch TP.HCM</h5>
+						<small>Khám phá danh thắng lịch sử Sài Gòn</small>
+					</div>
+				</a>
+				<div>
+					<small>Design By Nhóm 1</small>
+				</div>
+			</div>
+		</header>
+		<div class="container mb-4">
+			<ul class="nav nav-pills nav-fill custom-nav-pills" id="pills-tab">
+				<li class="nav-item">
+					<a class="nav-link {% if request.endpoint == 'homepage' or request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('homepage') }}">
+						<i class="bi bi-house-fill me-2"></i>Trang Chủ
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {% if request.endpoint == 'select_points' %}active{% endif %}" href="{{ url_for('select_points') }}">
+						<i class="bi bi-person-check-fill me-2"></i>Lộ Trình Tối Ưu (GTS)
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {% if request.endpoint == 'display_map' %}active{% endif %}" href="{{ url_for('display_map') }}">
+						<i class="bi bi-map-fill me-2"></i>Bản Đồ
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {% if request.endpoint == 'find_route_page' %}active{% endif %}" href="{{ url_for('find_route_page') }}">
+						<i class="bi bi-compass-fill me-2"></i>Tìm Đường (A-B)
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {% if request.endpoint == 'manage_locations' %}active{% endif %}" href="{{ url_for('manage_locations') }}">
+						<i class="bi bi-gear-fill me-2"></i>Quản Lý Địa Điểm
+					</a>
+				</li>
+			</ul>
+		</div>
+		<main class="container mb-5">
+			{% block content %}{% endblock %}
+		</main>
+
+		<footer class="bg-dark text-white py-2 mt-auto">
+			<div class="container text-center small">© 2025 Hướng Dẫn Du Lịch TP.HCM - Khám phá vẻ đẹp Sài Gòn</div>
+		</footer>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-" crossorigin="anonymous"></script>
+		<!-- Leaflet JS -->
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+		<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/select.js') }}"></script>
+		{% block scripts %}{% endblock %}
+	</body>
+</html>

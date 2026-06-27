@@ -1,0 +1,4 @@
+flask>=2.2
+flask-sqlalchemy>=3.0
+sqlalchemy>=1.4
+pyodbc>=4.0

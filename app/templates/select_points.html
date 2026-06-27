@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Chọn Điểm Tham Quan{% endblock %}
+
+{% block content %}
+<div class="row gx-4">
+	<!-- Cột trái: danh sách chọn -->
+	<div class="col-lg-7 mb-4">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				  {% if error %}
+				  <div class="alert alert-danger">{{ error }}</div>
+				  {% endif %}
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h5 class="card-title mb-0">Chọn Điểm Tham Quan</h5>
+						<small class="text-muted">Chọn các danh thắng bạn muốn tham quan để tìm lộ trình tối ưu</small>
+					</div>
+					<div class="d-flex gap-2">
+						<select id="filter-quan" class="form-select form-select-sm">
+							<option value="">Tất cả quận</option>
+							{% for q in quans %}
+							<option value="{{ q.id }}">{{ q.ten }}</option>
+							{% endfor %}
+						</select>
+						<select id="filter-loai" class="form-select form-select-sm">
+							<option value="">Tất cả loại</option>
+							{% for l in loai_diems %}
+							<option value="{{ l.id }}">{{ l.ten }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+
+				<form id="select-form" method="POST" action="{{ url_for('select_points') }}">
+					{{ csrf_token() if csrf_token is defined else "" }}
+					<div id="diem-list" class="list-group">
+						{% for diem in diems %}
+						<div class="list-group-item list-group-item-action mb-2 d-flex align-items-center diem-item" 
+						 data-quan-id="{{ diem.quan_id if diem.quan_id is defined else (diem.quan.id if diem.quan is defined else '') }}"
+						 data-loai-id="{{ diem.loai_id if diem.loai_id is defined else (diem.loai.id if diem.loai is defined else '') }}"
+						 data-duration="{{ diem.duration|default(60) }}"
+						 data-lat="{{ diem.vi_do|default('') }}"
+						 data-lng="{{ diem.kinh_do|default('') }}"
+						 data-image="{{ diem.image_url|default('') }}">
+						<div class="form-check me-3">
+							<input class="form-check-input select-diem" type="checkbox" value="{{ diem.id }}" id="diem-{{ diem.id }}" name="selected_diems">
+						</div>
+						<div class="flex-grow-1">
+							<label for="diem-{{ diem.id }}" class="mb-1 fw-semibold">{{ diem.ten }}</label>
+							<div class="small text-muted">
+								<span class="badge bg-light text-dark me-2">{{ (diem.quan.ten if diem.quan is defined else '') }}</span>
+								<i class="bi bi-clock"></i> {{ diem.duration|default(60) }} phút
+							</div>
+						</div>
+						</div>
+						{% else %}
+						<div class="alert alert-secondary">Không có điểm tham quan.</div>
+						{% endfor %}
+					</div>
+
+					<div class="mt-3 d-flex justify-content-between align-items-center">
+						<button type="submit" id="optimize-btn" class="btn btn-primary btn-lg">
+							<i class="bi bi-arrow-up-right-circle me-2"></i>
+							Tối Ưu Hóa Lộ Trình (<span id="selected-count">0</span> điểm)
+						</button>
+						<button type="button" id="select-all-btn" class="btn btn-outline-success">
+							<i class="bi bi-check-all"></i> Chọn tất cả
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Cột phải: tóm tắt + mini bản đồ -->
+	<div class="col-lg-5 mb-4">
+		<div class="card shadow-sm mb-3">
+			<div class="card-body">
+				<h6 class="card-title mb-2">Lộ Trình Tối Ưu</h6>
+				<div id="status-box" class="alert alert-success d-none" style="background-color: rgba(76, 175, 80, 0.1); border-color: #4CAF50; color: #2F4F4F;">Đã tìm thấy lộ trình tối ưu</div>
+
+				<div class="d-flex gap-3 mb-3">
+					<div class="p-2 border rounded w-100 text-center">
+						<small class="text-muted">Tổng thời gian dự kiến</small>
+						<div id="total-time" class="fw-bold text-primary">0h 0m</div>
+					</div>
+					<div class="p-2 border rounded w-100 text-center">
+						<small class="text-muted">Số điểm</small>
+						<div id="total-points" class="fw-bold text-primary">0 địa điểm</div>
+					</div>
+				</div>
+
+				<div class="card border-0 shadow-sm mb-3">
+					<div class="card-header text-white py-2" style="background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);">Bản Đồ Lộ Trình</div>
+					<div class="card-body p-0">
+						<div id="mini-map" style="height:260px; background: linear-gradient(180deg,#E0F7FA,#fff);"></div>
+					</div>
+				</div>
+
+				<div id="selected-summary" class="mt-2">
+					<ul id="selected-summary-list" class="list-unstyled mb-0">
+						<!-- được điền bởi func JS -->
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body text-center">
+				<button id="clear-selection" class="btn btn-outline-primary">Làm Mới</button>
+				</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

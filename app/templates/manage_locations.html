@@ -1,0 +1,488 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Quản Lý Địa Điểm{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="h4 fw-bold"><i class="fas fa-map-marked-alt me-2"></i>Quản Lý Địa Điểm Tham Quan</h3>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#locationModal" onclick="openCreateModal()">
+                    <i class="fas fa-plus me-2"></i>Thêm Địa Điểm Mới
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh tìm kiếm và lọc -->
+    <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm địa điểm...">
+                </div>
+                <div class="col-md-3">
+                    <select id="filterQuan" class="form-select">
+                        <option value="">Tất cả quận</option>
+                        {% for quan in quans %}
+                        <option value="{{ quan.id }}">{{ quan.ten }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filterLoai" class="form-select">
+                        <option value="">Tất cả loại</option>
+                        {% for loai in loai_diems %}
+                        <option value="{{ loai.id }}">{{ loai.ten }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-secondary w-100" onclick="resetFilters()">
+                        <i class="fas fa-redo me-1"></i>Đặt lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách địa điểm -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="locationsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%;">ID</th>
+                            <th style="width: 8%;">Hình Ảnh</th>
+                            <th style="width: 17%;">Tên Địa Điểm</th>
+                            <th style="width: 12%;">Quận</th>
+                            <th style="width: 12%;">Loại</th>
+                            <th style="width: 16%;">Địa Chỉ</th>
+                            <th style="width: 10%;">Tọa Độ</th>
+                            <th style="width: 10%;">TG Tham Quan</th>
+                            <th style="width: 10%;" class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locationsTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm/sửa địa điểm -->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locationModalLabel">Thêm Địa Điểm Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="locationForm">
+                    <input type="hidden" id="locationId">
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="locationName" class="form-label">Tên Địa Điểm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="locationName" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="locationQuan" class="form-label">Quận</label>
+                            <select class="form-select" id="locationQuan">
+                                <option value="">-- Chọn quận --</option>
+                                {% for quan in quans %}
+                                <option value="{{ quan.id }}">{{ quan.ten }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="locationLoai" class="form-label">Loại</label>
+                            <select class="form-select" id="locationLoai">
+                                <option value="">-- Chọn loại --</option>
+                                {% for loai in loai_diems %}
+                                <option value="{{ loai.id }}">{{ loai.ten }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="locationAddress" class="form-label">Địa Chỉ</label>
+                            <input type="text" class="form-control" id="locationAddress">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="locationLat" class="form-label">Vĩ Độ (Latitude) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.000001" class="form-control" id="locationLat" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="locationLng" class="form-label">Kinh Độ (Longitude) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.000001" class="form-control" id="locationLng" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="locationOpenTime" class="form-label">Giờ Mở Cửa</label>
+                            <input type="time" class="form-control" id="locationOpenTime">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="locationCloseTime" class="form-label">Giờ Đóng Cửa</label>
+                            <input type="time" class="form-control" id="locationCloseTime">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="locationDuration" class="form-label">Thời Gian Tham Quan (phút)</label>
+                            <input type="number" min="1" step="1" class="form-control" id="locationDuration" placeholder="VD: 60">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="locationDescription" class="form-label">Mô Tả</label>
+                            <textarea class="form-control" id="locationDescription" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="locationImageUrl" class="form-label">URL Hình Ảnh</label>
+                            <input type="url" class="form-control" id="locationImageUrl" placeholder="https://example.com/image.jpg">
+                            <div class="form-text">Nhập đường dẫn URL đến hình ảnh của địa điểm</div>
+                        </div>
+                        
+                        <div class="col-md-12" id="imagePreviewContainer" style="display: none;">
+                            <label class="form-label">Xem Trước Hình Ảnh</label>
+                            <div class="border rounded p-2 text-center">
+                                <img id="imagePreview" src="" alt="Preview" class="img-fluid" style="max-height: 200px; max-width: 100%; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveLocation()">
+                    <i class="fas fa-save me-2"></i>Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Xác Nhận Xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa địa điểm <strong id="deleteLocationName"></strong> không?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash me-2"></i>Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let allLocations = [];
+    let deleteLocationId = null;
+    const locationModal = new bootstrap.Modal(document.getElementById('locationModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+    // Tải danh sách địa điểm khi trang được load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadLocations();
+        
+        // Thiết lập event listeners cho tìm kiếm và lọc
+        document.getElementById('searchInput').addEventListener('input', filterLocations);
+        document.getElementById('filterQuan').addEventListener('change', filterLocations);
+        document.getElementById('filterLoai').addEventListener('change', filterLocations);
+        
+        // Thiết lập preview hình ảnh
+        document.getElementById('locationImageUrl').addEventListener('input', function() {
+            const url = this.value.trim();
+            const preview = document.getElementById('imagePreview');
+            const container = document.getElementById('imagePreviewContainer');
+            
+            if (url) {
+                preview.src = url;
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        });
+        
+        // Xử lý lỗi load hình ảnh
+        document.getElementById('imagePreview').addEventListener('error', function() {
+            this.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect fill=\'%23f0f0f0\' width=\'200\' height=\'200\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\' font-size=\'14\'%3EURL không hợp lệ%3C/text%3E%3C/svg%3E';
+        });
+    });
+
+    // Tải danh sách địa điểm từ API
+    async function loadLocations() {
+        try {
+            const response = await fetch('/api/manage/locations');
+            
+            if (!response.ok) {
+                throw new Error('Lỗi khi tải danh sách địa điểm');
+            }
+            
+            allLocations = await response.json();
+            renderLocations(allLocations);
+            
+        } catch (error) {
+            console.error('Error loading locations:', error);
+            document.getElementById('locationsTableBody').innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Lỗi: ${error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Render danh sách địa điểm vào bảng
+    function renderLocations(locations) {
+        const tbody = document.getElementById('locationsTableBody');
+        
+        if (locations.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center text-muted">
+                        <i class="fas fa-inbox me-2"></i>
+                        Không có địa điểm nào
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = locations.map(loc => {
+            const imageHtml = loc.image_url 
+                ? `<img src="${loc.image_url}" alt="${loc.name}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'60\\'%3E%3Crect fill=\\'%23f0f0f0\\' width=\\'60\\' height=\\'60\\'/%3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%23999\\' font-size=\\'12\\'%3ENo Image%3C/text%3E%3C/svg%3E';">`
+                : `<div class="text-muted small" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border: 1px dashed #ddd; border-radius: 4px;"><i class="fas fa-image"></i></div>`;
+            
+            const durationHtml = (loc.duration !== null && loc.duration !== undefined)
+                ? `${loc.duration} phút`
+                : '<em class="text-muted">—</em>';
+
+            return `
+                <tr>
+                    <td>${loc.id}</td>
+                    <td>${imageHtml}</td>
+                    <td><strong>${loc.name}</strong></td>
+                    <td>${loc.quan_name || '<em class="text-muted">Chưa có</em>'}</td>
+                    <td>${loc.loai_name || '<em class="text-muted">Chưa có</em>'}</td>
+                    <td>${loc.address || '<em class="text-muted">Chưa có</em>'}</td>
+                    <td class="small">${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}</td>
+                    <td>${durationHtml}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-info me-1" onclick="openEditModal(${loc.id})" title="Sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="openDeleteModal(${loc.id}, '${loc.name.replace(/'/g, "\\'")}')" title="Xóa">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Lọc địa điểm theo tìm kiếm và filter
+    function filterLocations() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const quanFilter = document.getElementById('filterQuan').value;
+        const loaiFilter = document.getElementById('filterLoai').value;
+        
+        const filtered = allLocations.filter(loc => {
+            const matchesSearch = loc.name.toLowerCase().includes(searchTerm) ||
+                                 (loc.address && loc.address.toLowerCase().includes(searchTerm));
+            const matchesQuan = !quanFilter || loc.quan_id == quanFilter;
+            const matchesLoai = !loaiFilter || loc.loai_id == loaiFilter;
+            
+            return matchesSearch && matchesQuan && matchesLoai;
+        });
+        
+        renderLocations(filtered);
+    }
+
+    // Reset filters
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterQuan').value = '';
+        document.getElementById('filterLoai').value = '';
+        renderLocations(allLocations);
+    }
+
+    // Mở modal tạo địa điểm mới
+    function openCreateModal() {
+        document.getElementById('locationModalLabel').textContent = 'Thêm Địa Điểm Mới';
+        document.getElementById('locationForm').reset();
+        document.getElementById('locationId').value = '';
+        document.getElementById('locationDuration').value = '';
+        // Ẩn preview hình ảnh
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+
+    // Mở modal sửa địa điểm
+    async function openEditModal(locationId) {
+        try {
+            const response = await fetch(`/api/manage/locations/${locationId}`);
+            
+            if (!response.ok) {
+                throw new Error('Không thể tải thông tin địa điểm');
+            }
+            
+            const location = await response.json();
+            
+            document.getElementById('locationModalLabel').textContent = 'Sửa Địa Điểm';
+            document.getElementById('locationId').value = location.id;
+            document.getElementById('locationName').value = location.name;
+            document.getElementById('locationQuan').value = location.quan_id || '';
+            document.getElementById('locationLoai').value = location.loai_id || '';
+            document.getElementById('locationAddress').value = location.address || '';
+            document.getElementById('locationLat').value = location.lat;
+            document.getElementById('locationLng').value = location.lng;
+            document.getElementById('locationOpenTime').value = location.open_time || '';
+            document.getElementById('locationCloseTime').value = location.close_time || '';
+            document.getElementById('locationDuration').value = (location.duration !== null && location.duration !== undefined) ? location.duration : '';
+            document.getElementById('locationDescription').value = location.description || '';
+            document.getElementById('locationImageUrl').value = location.image_url || '';
+            
+            // Hiển thị preview nếu có hình ảnh
+            if (location.image_url) {
+                document.getElementById('imagePreview').src = location.image_url;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+            } else {
+                document.getElementById('imagePreviewContainer').style.display = 'none';
+            }
+            
+            locationModal.show();
+            
+        } catch (error) {
+            console.error('Error loading location:', error);
+            alert('Lỗi: ' + error.message);
+        }
+    }
+
+    // Lưu địa điểm (tạo mới hoặc cập nhật)
+    async function saveLocation() {
+        const locationId = document.getElementById('locationId').value;
+        const isEdit = locationId !== '';
+        
+        const durationValue = document.getElementById('locationDuration').value;
+        
+        const data = {
+            name: document.getElementById('locationName').value,
+            quan_id: document.getElementById('locationQuan').value || null,
+            loai_id: document.getElementById('locationLoai').value || null,
+            address: document.getElementById('locationAddress').value,
+            lat: parseFloat(document.getElementById('locationLat').value),
+            lng: parseFloat(document.getElementById('locationLng').value),
+            open_time: document.getElementById('locationOpenTime').value,
+            close_time: document.getElementById('locationCloseTime').value,
+            duration: durationValue === '' ? null : parseInt(durationValue, 10),
+            description: document.getElementById('locationDescription').value,
+            image_url: document.getElementById('locationImageUrl').value
+        };
+        
+        // Validate
+        if (!data.name) {
+            alert('Vui lòng nhập tên địa điểm');
+            return;
+        }
+        if (isNaN(data.lat) || isNaN(data.lng)) {
+            alert('Vui lòng nhập tọa độ hợp lệ');
+            return;
+        }
+        if (data.duration !== null && (isNaN(data.duration) || data.duration <= 0)) {
+            alert('Vui lòng nhập thời gian tham quan hợp lệ');
+            return;
+        }
+        
+        try {
+            const url = isEdit ? `/api/manage/locations/${locationId}` : '/api/manage/locations';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Lỗi khi lưu địa điểm');
+            }
+            
+            const result = await response.json();
+            
+            alert(result.message);
+            locationModal.hide();
+            loadLocations();
+            
+        } catch (error) {
+            console.error('Error saving location:', error);
+            alert('Lỗi: ' + error.message);
+        }
+    }
+
+    // Mở modal xác nhận xóa
+    function openDeleteModal(locationId, locationName) {
+        deleteLocationId = locationId;
+        document.getElementById('deleteLocationName').textContent = locationName;
+        deleteModal.show();
+    }
+
+    // Xác nhận xóa địa điểm
+    async function confirmDelete() {
+        if (!deleteLocationId) return;
+        
+        try {
+            const response = await fetch(`/api/manage/locations/${deleteLocationId}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Lỗi khi xóa địa điểm');
+            }
+            
+            const result = await response.json();
+            
+            alert(result.message);
+            deleteModal.hide();
+            deleteLocationId = null;
+            loadLocations();
+            
+        } catch (error) {
+            console.error('Error deleting location:', error);
+            alert('Lỗi: ' + error.message);
+        }
+    }
+</script>
+{% endblock %}
